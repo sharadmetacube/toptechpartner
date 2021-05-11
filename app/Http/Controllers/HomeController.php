@@ -29,7 +29,6 @@ class HomeController extends Controller
         $user_id = Auth::id();
         $user = User::find($user_id);
         $token = PersonalAccessTokens::select('plainText')->where('tokenable_id',$user->id)->first();
-        //echo "<pre>"; print_r($token); die;
         if($token==null){
             $plainText = '';
         }else{

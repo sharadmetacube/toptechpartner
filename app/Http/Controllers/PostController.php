@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Posts;
+use App\Models\PersonalAccessTokens;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -15,7 +16,23 @@ class PostController extends Controller
     public function index(Request $request)
     {
         if($request->authToken){
-            return Posts::all();
+            $token = $request->authToken;
+            $token_arr = PersonalAccessTokens::select('tokenable_id','token_count')->where('plainText',$token)->first();
+            if($token_arr==null){ 
+               return 'Invalid authToken'; 
+            }else{
+                $user_id = $token_arr->tokenable_id;
+                if($token_arr->token_count==null){
+                    $token_count = 0;
+                }else{
+                    $token_count = $token_arr->token_count;
+                }
+                $updated_count = $token_count+1;
+                $updateTokenCount = PersonalAccessTokens::where('tokenable_id',$user_id)->first();
+                $updateTokenCount->token_count = $updated_count;
+                $updateTokenCount->save();
+                return Posts::all();
+           }
         }else{
             return 'authToken Missing';
         }

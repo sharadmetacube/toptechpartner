@@ -10,11 +10,13 @@
 			<table class="table">
 				<thead>
 					<th>Name</th>
+					<th>API Key</th>
 				</thead>
 				<tbody>
 					@foreach($categories as $category)
 					<tr>
 						<td>{{$category->name}}</td>
+						<td>{{$category->slug}}</td>
 					</tr>
 					@endforeach
 				</tbody>
