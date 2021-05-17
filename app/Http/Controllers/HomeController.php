@@ -28,11 +28,11 @@ class HomeController extends Controller
     {
         $user_id = Auth::id();
         $user = User::find($user_id);
-        $token = PersonalAccessTokens::select('plainText')->where('tokenable_id',$user->id)->first();
+        $token = PersonalAccessTokens::select('plainText','token_count')->where('tokenable_id',$user->id)->first();
         if($token==null){
             $plainText = '';
         }else{
-            $plainText = $token->plainText;
+            $plainText = $token;
         }
         return view('home')->with(['user'=>$user,'token'=>$plainText]);
     }

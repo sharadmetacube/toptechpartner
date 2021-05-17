@@ -1,0 +1,28 @@
+@media screen and (min-width: 801px){
+    .doc_subheading.key {
+        background: url(../images/key_x2.png) 1px 0 no-repeat;
+        background-size: 28px;
+        padding-left: 40px;
+        padding-bottom: 0;
+        font-weight: 500;
+    }
+}
+
+.mt-5 {
+    margin-top: -5px!important;
+}
+.doc_subheading {
+    color: #333 !important;
+    font-weight: 500;
+    letter-spacing: .5px;
+    font-size: 1.3rem;
+    opacity: .9;
+    margin-bottom: 8px;
+}
+
+.ui-widget-header {  
+    background: green;  
+    border: 1px solid #DDDDDD;  
+    color: #333333;  
+    font-weight: bold;  
+ }

@@ -5,7 +5,11 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Dashboard') }}</div>
+                <div class="card-header">{{ __('Control Panel - Dashboard') }}
+                    <div class="float-right">
+                        {{ __('You are logged in!') }}
+                    </div>
+                </div>
 
                 <div class="card-body">
                     @if (session('status'))
@@ -14,24 +18,40 @@
                         </div>
                     @endif
 
-                    {{ __('You are logged in!') }}
+                    
                     <div class="section">
                         <div class="alert alert-success alert-block" style="display: none;">
                             <button type="button" class="close" data-dismiss="alert">×</button>
                             <strong class="success-msg"></strong>
                         </div>
                         <form>
+                        @csrf
                             <div class="form-group">
-                                @csrf
+                                <h2 class="doc_subheading mt-5 key">Your API Access Key :-</h2>
+                            </div>
+                            @if($token)
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="accessTokenVal" readonly value="{{$token->plainText}}">
+                            </div>
+                            @endif
+                            <div class="form-group">
                                 <button class="btn btn-success" id="btnToken">Regenerate Access Token</button>
                                 <p class="success" id="loadMsg" style="display:none;">Loading Please wait ....</p>
                             </div> 
-                            @if($token)
-                            <div class="form-group">
-                                <input type="text" class="form-control" id="accessTokenVal" readonly value="{{$token}}">
-                            </div>
-                            @endif
                         </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"></div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <h2 class="doc_subheading mt-5">Your Plan :-</h2>
+                    </div>
+                    <div class="form-group">
+                        <p><strong>Subscription :- </strong><span>Free Plan</span></p>
+                        <p><strong>API Usage :- </strong><span>{{$token->token_count}} / 100</span></p>
+                        <div id="progressbar-api"></div>
                     </div>
                 </div>
             </div>
@@ -42,6 +62,14 @@
 
 @section('ajaxJsCode')
 <script type="text/javascript">
+    // For API Usage Progress Bar
+    $(function() {  
+        $( "#progressbar-api" ).progressbar({  
+             max: 50,  
+            value: {{$token->token_count}}
+        });  
+    }); 
+    // For Regenerate Token
     $(document).ready(function() {
         $("#btnToken").click(function(e){
             e.preventDefault();

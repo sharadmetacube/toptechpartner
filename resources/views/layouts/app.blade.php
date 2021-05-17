@@ -18,7 +18,10 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/jquery-ui.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
     <script src="{{asset('js/jquery.min.js')}}"></script>
+    <script src="{{asset('js/jquery-ui.js')}}"></script>
 </head>
 <body>
     <div id="app">
