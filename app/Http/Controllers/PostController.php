@@ -29,7 +29,7 @@ class PostController extends Controller
                     $token_count = 0;
                 }else{
                     //Check Token Limit
-                    if($token_arr->token_count>20){
+                    if($token_arr->token_count>40){
                         return "Token Limit Full , Regenerate New Token";
                     }else{
                         $token_count = $token_arr->token_count;
@@ -46,12 +46,15 @@ class PostController extends Controller
                     if($categories):
                         $posts = [];
                         foreach($categories as $k=>$v){
-                            $posts[] = Posts::whereRaw("find_in_set('".$k."',categories)")->toSql();
+                            $posts[$v] = \DB::table("posts")
+                                            ->select("post_title","post_excerpt","post_content","featured_image")
+                                            ->whereRaw("find_in_set($k,categories)")
+                                            ->get()->toArray();
                         }
                         return $posts;
                     endif;
                 }else{
-                    return Posts::all();
+                    return Posts::select("post_title","post_excerpt","post_content","featured_image")->get();
                 }
                 
            }

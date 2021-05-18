@@ -39,6 +39,7 @@ class FetchPosts extends Command
     public function handle()
     {
         $request_url = 'http://localhost/wordpress/wp-json/list_post/v1/list-post/';
+        $uploads_url_wp = 'http://localhost/wordpress/wp-content/uploads/';
         $credentials = array();
         $credentials = array( 'username: admin', 'password: admin' );
 
@@ -57,7 +58,7 @@ class FetchPosts extends Command
             foreach($postArr as $post){
                 $checkPost = Posts::where('wp_post_id',$post['ID'])->first();
                 if($checkPost){ }else{
-                    $insertPost = Posts::create(['wp_post_id'=>$post['ID'],'post_title'=>$post['post_title'],'post_excerpt'=>$post['post_excerpt'],'post_content'=>$post['post_content'],'featured_image'=>$post['meta_value'],'categories'=>$post['Categories'],'tags'=>$post['Tags']]);
+                    $insertPost = Posts::create(['wp_post_id'=>$post['ID'],'post_title'=>$post['post_title'],'post_excerpt'=>$post['post_excerpt'],'post_content'=>$post['post_content'],'featured_image'=>$uploads_url_wp.$post['meta_value'],'categories'=>str_replace(' ', '', $post['Categories']),'tags'=>$post['Tags']]);
                 }
             }
             $this->info('Posts has been updated successfully');
