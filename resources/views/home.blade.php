@@ -50,8 +50,8 @@
                     </div>
                     <div class="form-group">
                         <p><strong>Subscription :- </strong><span>Free Plan</span></p>
-                        <p><strong>API Usage :- </strong><span>{{$token->token_count}} / 100</span></p>
-                        <div id="progressbar-api"></div>
+                        <p><strong>API Usage :- </strong><span>{{$token->token_count}} / 20 </span></p>
+                        <progress value="{{$token->token_count}}" max="20"></progress>
                     </div>
                 </div>
             </div>
@@ -62,13 +62,6 @@
 
 @section('ajaxJsCode')
 <script type="text/javascript">
-    // For API Usage Progress Bar
-    $(function() {  
-        $( "#progressbar-api" ).progressbar({  
-             max: 50,  
-            value: {{$token->token_count}}
-        });  
-    }); 
     // For Regenerate Token
     $(document).ready(function() {
         $("#btnToken").click(function(e){

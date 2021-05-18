@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Posts;
+use App\Models\Categories;
 use App\Models\PersonalAccessTokens;
 use Illuminate\Http\Request;
 
@@ -15,9 +16,11 @@ class PostController extends Controller
      */
     public function index(Request $request)
     {
+        //Check if authToken is present as params
         if($request->authToken){
             $token = $request->authToken;
             $token_arr = PersonalAccessTokens::select('tokenable_id','token_count')->where('plainText',$token)->first();
+            //Check Token Validity 
             if($token_arr==null){ 
                return 'Invalid authToken'; 
             }else{
@@ -25,13 +28,32 @@ class PostController extends Controller
                 if($token_arr->token_count==null){
                     $token_count = 0;
                 }else{
-                    $token_count = $token_arr->token_count;
+                    //Check Token Limit
+                    if($token_arr->token_count>20){
+                        return "Token Limit Full , Regenerate New Token";
+                    }else{
+                        $token_count = $token_arr->token_count;
+                    }
                 }
                 $updated_count = $token_count+1;
                 $updateTokenCount = PersonalAccessTokens::where('tokenable_id',$user_id)->first();
                 $updateTokenCount->token_count = $updated_count;
                 $updateTokenCount->save();
-                return Posts::all();
+                // Check if Categories Exists in params
+                if($request->categories){
+                    $catArr = explode(',', $request->categories);
+                    $categories = Categories::whereIn('slug',$catArr)->pluck('name','wp_id')->toArray();
+                    if($categories):
+                        $posts = [];
+                        foreach($categories as $k=>$v){
+                            $posts[] = Posts::whereRaw("find_in_set('".$k."',categories)")->toSql();
+                        }
+                        return $posts;
+                    endif;
+                }else{
+                    return Posts::all();
+                }
+                
            }
         }else{
             return 'authToken Missing';
