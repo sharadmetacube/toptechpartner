@@ -50,8 +50,8 @@
                     </div>
                     <div class="form-group">
                         <p><strong>Subscription :- </strong><span>Free Plan</span></p>
-                        <p><strong>API Usage :- </strong><span>{{$token->token_count}} / 20 </span></p>
-                        <progress value="{{$token->token_count}}" max="20"></progress>
+                        <p><strong>API Usage :- </strong><span>{{$token->token_count}} / {{config('global.api_token_limit')}} </span></p>
+                        <progress value="{{$token->token_count}}" max="{{config('global.api_token_limit')}}"></progress>
                     </div>
                 </div>
             </div>

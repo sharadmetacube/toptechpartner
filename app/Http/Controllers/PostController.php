@@ -29,7 +29,7 @@ class PostController extends Controller
                     $token_count = 0;
                 }else{
                     //Check Token Limit
-                    if($token_arr->token_count>40){
+                    if($token_arr->token_count > config('global.api_token_limit')){
                         return "Token Limit Full , Regenerate New Token";
                     }else{
                         $token_count = $token_arr->token_count;
@@ -47,16 +47,15 @@ class PostController extends Controller
                         $posts = [];
                         foreach($categories as $k=>$v){
                             $posts[$v] = \DB::table("posts")
-                                            ->select("post_title","post_excerpt","post_content","featured_image")
+                                            ->select("id","post_title","post_excerpt","post_content","featured_image")
                                             ->whereRaw("find_in_set($k,categories)")
                                             ->get()->toArray();
                         }
                         return $posts;
                     endif;
                 }else{
-                    return Posts::select("post_title","post_excerpt","post_content","featured_image")->get();
-                }
-                
+                    return Posts::select("id","post_title","post_excerpt","post_content","featured_image")->get();
+                } 
            }
         }else{
             return 'authToken Missing';

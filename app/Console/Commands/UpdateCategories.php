@@ -40,7 +40,7 @@ class UpdateCategories extends Command
     {
         $request_url = 'http://localhost/wordpress/wp-json/list_cat/v1/categories/';
         $credentials = array();
-        $credentials = array( 'username: admin', 'password: admin' );
+        $credentials = array( 'username: '.config("global.wp_user_name").'', 'password: '.config("global.wp_user_pass").'' );
 
         $curl_handle = curl_init( );
         curl_setopt( $curl_handle, CURLOPT_URL, $request_url );

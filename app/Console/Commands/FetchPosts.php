@@ -41,7 +41,7 @@ class FetchPosts extends Command
         $request_url = 'http://localhost/wordpress/wp-json/list_post/v1/list-post/';
         $uploads_url_wp = 'http://localhost/wordpress/wp-content/uploads/';
         $credentials = array();
-        $credentials = array( 'username: admin', 'password: admin' );
+        $credentials = array( 'username: '.config("global.wp_user_name").'', 'password: '.config("global.wp_user_pass").'' );
 
         $curl_handle = curl_init( );
         curl_setopt( $curl_handle, CURLOPT_URL, $request_url );
