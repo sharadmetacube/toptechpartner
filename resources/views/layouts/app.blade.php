@@ -95,6 +95,9 @@
                             <li class="list-group-item">
                                 <a href="{{route('categories.index')}}">Categories</a>
                             </li>
+                            <li class="list-group-item">
+                                <a href="{{route('plans.index')}}">Plans</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="col-md-10">
@@ -109,6 +112,7 @@
     </div>
 @auth
 @yield('ajaxJsCode')
+@yield('scripts')
 @endauth
 </body>
 </html>

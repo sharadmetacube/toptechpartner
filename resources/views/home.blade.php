@@ -42,6 +42,7 @@
                     </div>
                 </div>
             </div>
+            @if($token)
             <div class="card">
                 <div class="card-header"></div>
                 <div class="card-body">
@@ -55,6 +56,7 @@
                     </div>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 </div>
@@ -76,6 +78,7 @@
                     if(data!=false){
                         $('#accessTokenVal').val(data);
                         $('#loadMsg').hide();
+                        location.reload();
                     }
                 }
             });
