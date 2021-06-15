@@ -10,7 +10,7 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    <script src="{{ asset('js/app.js') }}"></script>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -86,17 +86,28 @@
                 @if(session()->has('success'))
                 <div class="alert alert-success">{{session()->get('success')}}</div>
                 @endif
+                <?php 
+                    if(auth()->user()->role==1){
+                        $dashUrl = route('admin.dashboard');
+                        $plansUrl = route('plans.list');
+                    }elseif(auth()->user()->role==2){
+                        $dashUrl = route('user.dashboard');
+                        $plansUrl = route('plans.index');
+                    }
+                ?>
                 <div class="row">
                     <div class="col-md-2">
                         <ul class="list-group">
                             <li class="list-group-item">
-                                <a href="{{route('home')}}">Dashboard</a>
+                                <a href="{{ $dashUrl }}">Dashboard</a>
                             </li>
+                        <?php if(auth()->user()->role==1){ ?>
                             <li class="list-group-item">
                                 <a href="{{route('categories.index')}}">Categories</a>
                             </li>
+                        <?php } ?>
                             <li class="list-group-item">
-                                <a href="{{route('plans.index')}}">Plans</a>
+                                <a href="{{ $plansUrl }}">Plans</a>
                             </li>
                         </ul>
                     </div>

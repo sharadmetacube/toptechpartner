@@ -16,6 +16,7 @@
                             </label>
                         </div>
                         <div class="card-body">
+                            <input type="text" value="" id="card-holder-name" class="form-control">
                             <div id="card-element">
                             <!-- A Stripe Element will be inserted here. -->
                             </div>
@@ -28,7 +29,6 @@
                       <button
                       id="card-button"
                       class="btn btn-dark"
-                      type="submit"
                       data-secret="{{ $intent->client_secret }}"
                     > Pay </button>
                     </div>
@@ -64,6 +64,7 @@
     const elements = stripe.elements(); // Create an instance of Elements.
     const cardElement = elements.create('card', { style: style }); // Create an instance of the card Element.
     const cardButton = document.getElementById('card-button');
+    const cardHolderName = document.getElementById('card-holder-name');
     const clientSecret = cardButton.dataset.secret;
 
     cardElement.mount('#card-element'); // Add an instance of the card Element into the `card-element` <div>.
@@ -81,37 +82,38 @@
     // Handle form submission.
     var form = document.getElementById('payment-form');
 
-    form.addEventListener('submit', function(event) {
+    cardButton.addEventListener('click', async function(event) {
         event.preventDefault();
 
-        stripe
-            .handleCardSetup(clientSecret, cardElement, {
-                payment_method_data: {
-                    //billing_details: { name: cardHolderName.value }
+        const { setupIntent, error } = await stripe.confirmCardSetup(
+            clientSecret, {
+                payment_method: {
+                    card: cardElement,
+                    billing_details: { name: cardHolderName.value }
                 }
-            })
-            .then(function(result) {
-                console.log(result);
-                if (result.error) {
-                    // Inform the user if there was an error.
-                    var errorElement = document.getElementById('card-errors');
-                    errorElement.textContent = result.error.message;
-                } else {
-                    console.log(result);
-                    // Send the token to your server.
-                    stripeTokenHandler(result.setupIntent.payment_method);
-                }
-            });
+            }
+        );
+
+        if (error) {
+            var errorElement = document.getElementById('card-errors');
+            errorElement.textContent = error.message;
+            console.log(error.message);
+        } else {
+            //console.log(setupIntent);
+            //console.log('success');
+            // Send the token to your server.
+            stripeTokenHandler(setupIntent);
+        }
     });
 
     // Submit the form with the token ID.
-    function stripeTokenHandler(paymentMethod) {
+    function stripeTokenHandler(setupIntent) {
         // Insert the token ID into the form so it gets submitted to the server
         var form = document.getElementById('payment-form');
         var hiddenInput = document.createElement('input');
         hiddenInput.setAttribute('type', 'hidden');
         hiddenInput.setAttribute('name', 'paymentMethod');
-        hiddenInput.setAttribute('value', paymentMethod);
+        hiddenInput.setAttribute('value', setupIntent.payment_method);
         form.appendChild(hiddenInput);
 
         // Submit the form

@@ -15,7 +15,11 @@ class PlanController extends Controller
     public function index()
     {
         $plans = Plan::all();
-        return view('plans.index', compact('plans'));
+        if(auth()->user()->role==1){
+            return view('dashboards.admins.plans.index', compact('plans'));
+        }elseif(auth()->user()->role==2){
+            return view('dashboards.users.plans.index', compact('plans'));
+        }
     }
 
     /**
@@ -29,6 +33,10 @@ class PlanController extends Controller
 
         $intent = $request->user()->createSetupIntent();
         
-        return view('plans.show', compact('plan', 'intent'));
+        if(auth()->user()->role==1){
+            return view('dashboards.admins.plans.show', compact('plan', 'intent'));
+        }elseif(auth()->user()->role==2){
+            return view('dashboards.users.plans.show', compact('plan', 'intent'));
+        }
     }
 }
