@@ -68,6 +68,7 @@
                                                      document.getElementById('logout-form').submit();">
                                         {{ __('Logout') }}
                                     </a>
+                                    <a class="dropdown-item" href="{{ url('/login-activity') }}"><i class="fa fa-btn fa-list"></i>Login Activity</a>
 
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                         @csrf
@@ -108,6 +109,12 @@
                         <?php } ?>
                             <li class="list-group-item">
                                 <a href="{{ $plansUrl }}">Plans</a>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="{{ route('user.profile') }}">Update Profile</a>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="{{route('change.password_view')}}">Change Password</a>
                             </li>
                         </ul>
                     </div>

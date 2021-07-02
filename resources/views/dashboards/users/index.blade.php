@@ -49,6 +49,8 @@
                 else:
                     $tokenCount = $token->token_count;
                 endif;
+
+                if($plan): $planName = $plan->name; $cancels_at =  'cancels at '.date("jS F, Y", strtotime($plan->cancels_at)); else: $planName = 'No Plan Selected'; $cancels_at =''; endif;
             ?>
             <div class="card">
                 <div class="card-header"></div>
@@ -57,7 +59,7 @@
                         <h2 class="doc_subheading mt-5">Your Plan :-</h2>
                     </div>
                     <div class="form-group">
-                        <p><strong>Subscription :- </strong><span>Free Plan</span></p>
+                        <p><strong>Subscription :- </strong><span>{{$planName}}  </span><span style="color:red;">{{$cancels_at}}</span></p>
                         <p><strong>API Usage :- </strong><span>{{$tokenCount}} / {{config('global.api_token_limit')}} </span></p>
                         <progress value="{{$tokenCount}}" max="{{config('global.api_token_limit')}}"></progress>
                     </div>

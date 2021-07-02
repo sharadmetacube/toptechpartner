@@ -1,13 +1,22 @@
 @extends('layouts.app')
 @section('content')
+<?php
+    if(!empty($subscription)){
+        $txt = 'Will be Charged from next billing cycle .';
+        $route = route('plans.updateSubscription');
+    }else{
+        $txt = '';
+        $route = route('plans.processSubscription');
+    }
+?>
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="">
-                <p>You will be charged ${{ number_format($plan->cost, 2) }} for {{ $plan->name }} Plan</p>
+                <p>You will be charged ${{ number_format($plan->cost, 2) }} for {{ $plan->name }} Plan. {{$txt}}</p>
             </div>
             <div class="card">
-                <form action="{{ route('subscription.create') }}" method="post" id="payment-form">
+                <form action="{{ $route }}" method="post" id="payment-form">
                     @csrf                    
                     <div class="form-group">
                         <div class="card-header">
@@ -99,8 +108,6 @@
             errorElement.textContent = error.message;
             console.log(error.message);
         } else {
-            //console.log(setupIntent);
-            //console.log('success');
             // Send the token to your server.
             stripeTokenHandler(setupIntent);
         }

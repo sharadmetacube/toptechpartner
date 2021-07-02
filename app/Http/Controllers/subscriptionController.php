@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 require_once('../vendor/autoload.php');
 
 use Auth;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-//use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use App\Models\Plan;
 use App\Models\User;
 use Laravel\Cashier\Cashier;
@@ -107,6 +108,18 @@ class SubscriptionController extends Controller
 
     public function showSubscription() { 
         $plans = $this->retrievePlans();
+        if(!empty($plans)){
+            foreach($plans as $plan){
+                $fnPlan = Plan::firstOrNew(array('name' => $plan->product->name));
+                $fnPlan->slug = Str::slug($plan->product->name);
+                $fnPlan->stripe_plan = $plan->id;
+                $fnPlan->description = $plan->product->description;
+                $fnPlan->cost = ($plan->amount)/100;
+                $fnPlan->created_at = date('Y-m-d H:i:s', $plan->created);
+                $fnPlan->save();
+            }
+        }
+
         $user = Auth::user();
         
         return view('dashboards.users.plans.subscribe', [
@@ -121,15 +134,31 @@ class SubscriptionController extends Controller
         $user = Auth::user();
         $paymentMethod = $request->input('payment_method');
         $token = config('services.stripe.secret');
-        $options = [
-            'description' => 'Customer Subscribed for plans',
-            'name' => $user->name,
-            'email' => $user->email,
-            "address" => ["city" => $user->city, "country" => $user->country, "line1" => $user->line1, "line2" => $user->line2, "postal_code" => $user->postal_code, "state" => $user->state]
-        ];
-        $user->createOrGetStripeCustomer($options);
-        $user->addPaymentMethod($paymentMethod);
-        $plan = $request->input('plan');       
+        $stripe = new \Stripe\StripeClient($token);
+        if($user->stripe_id!=NULL){
+            $customer = $stripe->customers->update(
+                $user->stripe_id,
+                [
+                    'address' => ['city' => $user->city , 'country' => $user->country , 'state' => $user->state , 'postal_code' => $user->postal_code , 'line1' => $user->line1 , 'line2' => $user->line2],
+                    'name' => $user->name,
+                    'description' => 'Customer Subscribed for plan',
+                    'email' => $user->email
+                ]
+            );
+        }else{
+            $customer = $stripe->customers->create([
+                'address' => ['city' => $user->city , 'country' => $user->country , 'state' => $user->state , 'postal_code' => $user->postal_code , 'line1' => $user->line1 , 'line2' => $user->line2],
+                'name' => $user->name,
+                'description' => 'Customer Subscribed for plan',
+                'email' => $user->email
+            ]);
+            //update stripe customer id in user table for reference
+            $updateUsers = DB::table('users')->where('id', $user->id)->update(['stripe_id' => $customer->id]);
+        }
+
+        //$user->createOrGetStripeCustomer();
+        $plan = $request->input('plan'); 
+        $user->addPaymentMethod($paymentMethod);      
         try {
             $user->newSubscription('default', $plan)->create($paymentMethod, [
                 'email' => $user->email
@@ -140,4 +169,27 @@ class SubscriptionController extends Controller
         
         return redirect()->route('user.dashboard')->with('success', 'Your plan subscribed successfully');
    }
+
+    public function updateSubscription(Request $request){
+        $user = Auth::user();
+        $plan = Plan::find($request->plan);
+        $getSubscription = DB::table('subscriptions')->where('user_id', auth()->user()->id)->where('stripe_status','active')->orderBy('id', 'DESC')->first();
+        $update_subscription = $user->subscription($getSubscription->name)->noProrate()->swap($plan->stripe_plan);
+        if($update_subscription){
+            return redirect()->route('user.dashboard')->with('success', 'Your plan updated successfully and will be charged from next billing cycle !');
+        }else{
+            return redirect()->route('user.dashboard')->with('error', 'Error in Updating your subscription.');
+        }
+    }
+
+    public function cancelSubscription(Request $request){
+        $user = Auth::user();
+        $getSubscription = DB::table('subscriptions')->where('user_id', auth()->user()->id)->where('stripe_status','active')->orderBy('id', 'DESC')->first();
+        $cancel_subscription = $user->subscription($getSubscription->name)->cancel();
+        if($cancel_subscription){
+            return redirect()->route('user.dashboard')->with('success', 'Your plan cancelled successfully !');
+        }else{
+            return redirect()->route('user.dashboard')->with('error', 'Error in cancelling your subscription. Please contact site administrator');
+        }
+    }
 }

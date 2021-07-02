@@ -43,6 +43,7 @@ Route::group(['prefix'=>'admin', 'middleware'=>['isAdmin','auth','PreventBackHis
 Route::group(['prefix'=>'user', 'middleware'=>['isUser','auth','PreventBackHistory']], function(){
     Route::get('dashboard', [UserController::class, 'index'])->name('user.dashboard');
     Route::get('profile', [UserController::class, 'profile'])->name('user.profile');
+    Route::patch('{user}/update', ['as' => 'users.update', 'uses' => 'UserController@profileUpdate']);
 
     Route::post('generate/token', [PersonalAccessTokensController::class, 'generate_token'])->name('generate.token');
     
@@ -53,4 +54,12 @@ Route::group(['prefix'=>'user', 'middleware'=>['isUser','auth','PreventBackHisto
     //Routes for subscription plans
     Route::get('/subscribe', 'SubscriptionController@showSubscription')->name('plans.showSubscription');
     Route::post('/subscribe', 'SubscriptionController@processSubscription')->name('plans.processSubscription');
+    Route::post('/update-subscription', 'SubscriptionController@updateSubscription')->name('plans.updateSubscription');
+    Route::get('/cancel-subscription', 'SubscriptionController@cancelSubscription')->name('plans.cancelSubscription');
+
+    //Routes for change password
+    Route::get('change-password', 'ChangePasswordController@index')->name('change.password_view');
+    Route::post('change-password', 'ChangePasswordController@store')->name('change.password');
 });
+
+Route::get('/login-activity', 'LoginActivityController@index')->middleware('auth');
